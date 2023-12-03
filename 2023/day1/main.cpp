@@ -1,9 +1,6 @@
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
-#include <unordered_map>
-#include <tuple>
 
 
 void part_one() {
@@ -12,89 +9,114 @@ void part_one() {
   if (!inputFile.is_open()) {
     return;
   }
-  std::stringstream buffer;
 
-  buffer << inputFile.rdbuf(); 
+  std::string line;
 
-  inputFile.close();    
-  std::string fileContent = buffer.str();
+  int sum = 0;
+  while (std::getline(inputFile, line)) {
+    char leftMost = ' ';
+    char rightMost = ' ';
 
+    for (char& c : line) {
 
-  int suma = 0;
+      if (std::isdigit(c)) {
+        if (leftMost == ' ') {
+          leftMost = c;
+          rightMost = c;
+        } else {
+          rightMost = c;
+        }
+      }
 
-  std::vector<char> charNumbers;
-
-  for (int i = 0; i < fileContent.size(); i++) {
-    if (fileContent[i] == '\n') {
-      std::string n;
-      n += charNumbers[0];
-      n += charNumbers[charNumbers.size() - 1];
-      suma += std::stoi(n);
-      charNumbers.clear();
-      continue;
     }
 
-    if (std::isdigit(fileContent[i])) {
-      charNumbers.push_back(fileContent[i]);
-    }
+    std::cout << leftMost << rightMost << std::endl;
+    
+    std::string number;
+    number += leftMost;
+    number += rightMost;
+    
+    sum += std::atoi(number.c_str());
   }
 
-  std::cout << suma;
+  inputFile.close();
+
+  std::cout << sum << std::endl;
 }
 
 
+int match_digits(std::string input) {
+  const char* digits[9] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+  for (int i = 0; i < 9; i++) {
+    if (input.find(digits[i]) != std::string::npos) {
+      return i + 1;
+    }
+  }
+  return -1;
+}
+
 
 void part_two() {
-  std::unordered_map<std::string, int> digits = {
-    {"one", 1},
-    {"two", 2},
-    {"three", 3},
-    {"four", 4},
-    {"five", 5},
-    {"six", 6},
-    {"seven", 7},
-    {"eight", 8},
-    {"nine", 9},
-  };
-
   std::ifstream inputFile("input.txt");
 
-  std::vector<std::string> lines;
-  std::string l;
-
-  while (std::getline(inputFile, l)) {
-      lines.push_back(l);
+  if (!inputFile.is_open()) {
+    return;
   }
-  inputFile.close();
+
+  std::string line;
 
   int sum = 0;
-  
-  std::vector<std::tuple<int, int>> numberPosistions;
+  while (std::getline(inputFile, line)) {
+    char leftMost = ' ';
+    char rightMost = ' ';
 
-  for (const auto& str : lines) {
+    std::string currentString = "";
 
-      for (const auto& item: digits)  {
-        size_t find = str.find(item.first);
-        if (find != std::string::npos) {
-          int first = find;
-          int last = first + (str.size() - 1);
-          numberPosistions.push_back(std::make_tuple(first, last));
+    for (char& c : line) {
+      currentString += c;
+      int r = match_digits(currentString);
+
+      if (r != -1) {
+          if (leftMost == ' ') {
+            leftMost = '0' + r;
+            rightMost = '0' + r;
+          } else {
+            rightMost = '0' + r;
+          }
+
+        currentString = "";
+        currentString += c;
+
+      } else {
+        if (std::isdigit(c)) {
+          if (leftMost == ' ') {
+            leftMost = c;
+            rightMost = c;
+          } else {
+            rightMost = c;
+          }
         }
       }
-
-      for (int i = 0; i < str.size(); i++) {
-        if (std::isdigit(str[i])) {
-          numberPosistions.push_back(std::make_tuple(i, i));
-        }
-      }
+    }
+    
+    std::string number;
+    number += leftMost;
+    number += rightMost;
+    
+    sum += std::atoi(number.c_str());
   }
+
+  inputFile.close();
+
+  std::cout << sum << std::endl;
 }
 
 
 
 int main() {
-  std::cout << "Part one: " << std::endl;
-  part_one();
+  // std::cout << "Part one: " << std::endl;
+  //
+  // part_one();
   std::cout << "Part two: " << std::endl;
   part_two();
 
