@@ -5,15 +5,18 @@ with open('input.txt', 'r') as file:
 n = len(content)
 m = len(content[0])
 
+gears = [ [ [] for _ in range(m) ] for _ in range(n)]
 
-def is_symbol(y, x) -> bool:
+
+def add_gears(y, x, num) -> bool:
     if not (0 <= y < n and 0 <= x < m):
-        return False
+        return
 
-    return content[y][x] != "." and not content[y][x].isdigit()
+    if content[y][x] == "*":
+        gears[y][x].append(num)
 
 
-def part_one():
+def part_two():
     answer = 0
 
     for y, row in enumerate(content):
@@ -35,19 +38,27 @@ def part_one():
 
             num = int(num)
 
-            if is_symbol(y, start-1) or is_symbol(y, x):
-                answer += num
-                continue
+            add_gears(y, start-1, num)  
+            add_gears(y, x, num)
 
             for k in range(start-1, x+1):
-                if is_symbol(y-1, k) or is_symbol(y+1, k):
-                    answer += num
-                    break
+                add_gears(y-1, k, num)
+                add_gears(y+1, k, num)
+            
+
+    for y in range(n):
+        for x in range(m):
+            if content[y][x] == '*' and len(gears[y][x]) == 2:
+                answer += gears[y][x][0] * gears[y][x][1]
+        
+
+
+
+
     print(answer)
 
-
 def main():
-    part_one()
+    part_two()
 
 
 if __name__ == '__main__':
