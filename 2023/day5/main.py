@@ -1,58 +1,57 @@
-from pprint import pprint
+with open('input.txt', 'r') as file:
+    content = [line.strip() for line in file.readlines()]
 
 
-def fill_missing_numbers(numbers: dict) -> None:
-    for i in range(0, max(numbers,key=numbers.get)):
-        if (i not in numbers.keys()):
-            numbers[i] = i
+seeds = content[0].split(":")[1].strip().split(" ")
+
+seeds_ranges = []
+for i in range(len(seeds) - 1):
+    seeds_ranges.append((seeds[i], seeds[i+1]))
 
 
-def dest_source_range(row: str) -> tuple[int, int, int]:
-     splited_row = row.split(" ")
-     return (int(splited_row[0]), int(splited_row[1]), int(splited_row[2]))
+content = content[2:]
 
+maps = []
 
-def create_almanac(content: list) -> list[str]:
-    i = 0
-    almanac = []
-    while i < len(content):
-        row = []
-        while i < len(content) and content[i] != '':
-            row.append(content[i])
+i = 0
+while i < len(content):
+    current_map = []
+    while i < len(content) and content[i] != '':
+        if not content[i][0].isnumeric():
             i += 1
-        almanac.append(row)
+            continue
+        current_map.append([int(n) for n in content[i].split(' ')])
         i += 1
-    return almanac
+
+    maps.append(current_map)
+    i += 1
 
 
+def find_localization(seed: int) -> int:
+    current_number = seed
+    for map in maps:
 
-def part_one():
-    with open('sample.txt', 'r') as file:
-        content = [line.strip() for line in file.readlines()]
+        for line in map:
+            destination_start, source_start, range_length = line
+            source_end = source_start + range_length - 1 
+            if source_start <= current_number <= source_end:
+                current_number = (current_number - source_start) + destination_start
+                break
 
-
-    seeds = content[0].split(":")[1].strip().split(" ")
-    seeds = [int(s) for s in seeds]
-
-
-    almanac = create_almanac(content[2:])
-    numbers = dict()
-
-    
-    for index, row in enumerate(almanac):
-        for i in range(1, len(row)):
-            dest_range_start, source_range_start, range_length = dest_source_range(row[i])
+    return current_number
 
 
-            for j in range(0, range_length):
-                numbers[source_range_start + j] =  dest_range_start + j
+min_local = []
+for i, s in enumerate(seeds_ranges):
+    seed_start = int(s[0])
+    seed_end = seed_start + int(s[1])
 
-        fill_missing_numbers(numbers)
-        pprint(numbers)
+    localizations = [find_localization(n) for n in range(seed_start, seed_end)]
+    min_local.append(min(localizations))
 
-def main():
-    part_one()
+print(min(min_local))
 
 
-if __name__ == '__main__':
-    main()
+# localizations = [find_localization(s) for s in seeds ]
+#
+# print(min(localizations))
