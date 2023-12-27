@@ -41,17 +41,9 @@ def find_localization(seed: int) -> int:
     return current_number
 
 
-min_local = []
-for i, s in enumerate(seeds_ranges):
-    seed_start = int(s[0])
-    seed_end = seed_start + int(s[1])
 
-    localizations = [find_localization(n) for n in range(seed_start, seed_end)]
-    min_local.append(min(localizations))
+localizations = []
+for s in seeds:
+    localizations.append(find_localization(int(s)))
 
-print(min(min_local))
-
-
-# localizations = [find_localization(s) for s in seeds ]
-#
-# print(min(localizations))
+print(min(localizations))
